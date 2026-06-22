@@ -10,9 +10,11 @@ export default function App() {
     <div className="app">
       <nav className="navbar">
         <div className="nav-brand">
-          <span className="nav-icon">🎙️</span>
-          <span className="nav-title">VoiceScript</span>
-        </div>
+  <div className="nav-logo">
+    <span className="logo-v">V</span>
+    <span className="logo-s">S</span>
+  </div>
+</div>
         <div className="nav-links">
           <button
             className={`nav-btn ${page === "home" ? "active" : ""}`}
