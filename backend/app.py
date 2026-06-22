@@ -16,6 +16,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import whisper
 from database import init_db, save_transcription, get_transcriptions, delete_transcription
+import threading
+import requests
+import time
 
 app = Flask(__name__)
 CORS(app)  # allow requests from React frontend
@@ -27,6 +30,16 @@ print("Whisper ready.")
 
 # Initialise database tables
 init_db()
+
+def keep_alive():
+    while True:
+        time.sleep(840)  # ping every 14 minutes
+        try:
+            requests.get(os.environ.get("RENDER_URL", "http://localhost:5000") + "/health")
+        except:
+            pass
+
+threading.Thread(target=keep_alive, daemon=True).start()
 
 
 @app.route("/health", methods=["GET"])
