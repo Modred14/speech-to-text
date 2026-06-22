@@ -104,7 +104,7 @@ export default function Home() {
           <span>🎙️</span> Open-Source · MIT Licensed
         </div>
         <h1>Turn speech into text — instantly</h1>
-        <p>Record your microphone or upload an audio file. Powered by Whisper AI.</p>
+        <p>Record your microphone or upload an audio file. Powered by Groq AI.</p>
       </div>
 
       {/* Microphone recorder */}
