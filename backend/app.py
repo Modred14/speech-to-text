@@ -1,41 +1,35 @@
 """
 VoiceScript Backend
 -------------------
-Flask API that handles:
-  - POST /transcribe       — receives audio, runs Whisper, returns text
-  - GET  /transcriptions   — list saved transcriptions from PostgreSQL
-  - POST /transcriptions   — save a transcription
-  - DELETE /transcriptions/<id> — delete one
-
-Requirements: see requirements.txt
+Flask API using Groq Whisper API (no local model — RAM friendly)
 """
+
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
 import tempfile
+import threading
+import time
+import requests
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import whisper
+from groq import Groq
 from database import init_db, save_transcription, get_transcriptions, delete_transcription
-import threading
-import requests
-import time
 
 app = Flask(__name__)
-CORS(app)  # allow requests from React frontend
+CORS(app)
 
-# Load Whisper model once at startup (base model — fast & free)
-print("Loading Whisper model...")
-model = whisper.load_model("base")
-print("Whisper ready.")
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-# Initialise database tables
 init_db()
 
 def keep_alive():
     while True:
-        time.sleep(840)  # ping every 14 minutes
+        time.sleep(840)
         try:
-            requests.get(os.environ.get("RENDER_URL", "http://localhost:5000") + "/health")
+            url = os.environ.get("RENDER_URL", "http://localhost:5000") + "/health"
+            requests.get(url, timeout=10)
         except:
             pass
 
@@ -44,7 +38,7 @@ threading.Thread(target=keep_alive, daemon=True).start()
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "model": "whisper-base"})
+    return jsonify({"status": "ok", "model": "groq-whisper"})
 
 
 @app.route("/transcribe", methods=["POST"])
@@ -53,20 +47,21 @@ def transcribe():
         return jsonify({"error": "No audio file provided"}), 400
 
     audio_file = request.files["audio"]
-
-    # Save to a temp file so Whisper can read it
     suffix = os.path.splitext(audio_file.filename or ".webm")[1] or ".webm"
+
     with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
         tmp_path = tmp.name
         audio_file.save(tmp_path)
 
     try:
-        result = model.transcribe(tmp_path)
-        text = result["text"].strip()
-        return jsonify({
-            "text": text,
-            "language": result.get("language", "unknown"),
-        })
+        with open(tmp_path, "rb") as f:
+            result = client.audio.transcriptions.create(
+                file=(os.path.basename(tmp_path), f),
+                model="whisper-large-v3-turbo",
+                response_format="text"
+            )
+        text = result.strip() if isinstance(result, str) else result.text.strip()
+        return jsonify({"text": text, "language": "auto"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
@@ -75,8 +70,7 @@ def transcribe():
 
 @app.route("/transcriptions", methods=["GET"])
 def list_transcriptions():
-    items = get_transcriptions()
-    return jsonify(items)
+    return jsonify(get_transcriptions())
 
 
 @app.route("/transcriptions", methods=["POST"])
@@ -84,7 +78,6 @@ def create_transcription():
     data = request.get_json()
     if not data or not data.get("text"):
         return jsonify({"error": "text is required"}), 400
-
     item = save_transcription(data["text"], data.get("source", "microphone"))
     return jsonify(item), 201
 

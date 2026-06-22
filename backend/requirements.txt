@@ -1,6 +1,6 @@
 flask
 flask-cors
-openai-whisper
+groq
 psycopg2-binary
 python-dotenv
 requests
