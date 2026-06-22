@@ -1,6 +1,6 @@
 # 🎙️ VoiceScript — Open-Source Speech-to-Text Transcription Tool
 
-> **Final Year Project | MIT Licensed**  
+> **Project | MIT Licensed**  
 > A full-stack web application that converts spoken audio into editable text using OpenAI's Whisper AI model.
 
 ---
@@ -25,7 +25,7 @@
 | Backend    | Python + Flask                |
 | AI Model   | OpenAI Whisper (base, local)  |
 | Database   | PostgreSQL                    |
-| Hosting    | Vercel (frontend) + Railway (backend + DB) |
+| Hosting    | Netlify (frontend) + Render (backend + DB) |
 | Licence    | MIT                           |
 
 ---
