@@ -21,9 +21,9 @@ app = Flask(__name__)
 CORS(app)  # allow requests from React frontend
 
 # Load Whisper model once at startup (base model — fast & free)
-print("⏳ Loading Whisper model...")
+print("Loading Whisper model...")
 model = whisper.load_model("base")
-print("✅ Whisper ready.")
+print("Whisper ready.")
 
 # Initialise database tables
 init_db()

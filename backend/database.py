@@ -1,6 +1,8 @@
 """
 database.py — PostgreSQL connection & queries using psycopg2
 """
+from dotenv import load_dotenv
+load_dotenv()
 
 import os
 import psycopg2
@@ -32,7 +34,7 @@ def init_db():
     conn.commit()
     cur.close()
     conn.close()
-    print("✅ Database ready.")
+    print("Database ready.")
 
 
 def save_transcription(text: str, source: str = "microphone") -> dict:
