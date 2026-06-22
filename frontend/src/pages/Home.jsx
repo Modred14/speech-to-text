@@ -167,7 +167,7 @@ export default function Home() {
       {processing && (
         <div className="processing">
           <div className="spinner" />
-          <span className="processing-text">Transcribing your audio with Whisper AI…</span>
+          <span className="processing-text">Transcribing your audio with Groq AI…</span>
         </div>
       )}
 
