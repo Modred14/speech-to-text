@@ -20,13 +20,13 @@
 ## Tech Stack
 
 | Layer      | Technology                     |
-|------------|-------------------------------|
-| Frontend   | React + Vite                  |
-| Backend    | Python + Flask                |
-| AI Model   | OpenAI Whisper (base, local)  |
-| Database   | PostgreSQL                    |
-| Hosting    | Netlify (frontend) + Render (backend + DB) |
-| Licence    | MIT                           |
+|------------|--------------------------------------|
+| Frontend   | React + Vite                         |
+| Backend    | Python + Flask                       |
+| AI Model   |  Groq Whisper Large v3 Turbo (API)   |
+| Database   | PostgreSQL                           |
+| Hosting    | Netlify (frontend) + Rende (backend) |
+| Licence    | MIT                                  |
 
 ---
 
