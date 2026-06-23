@@ -10,33 +10,17 @@ export default function History() {
   const { toast, showToast } = useToast();
 
   useEffect(() => {
-    load();
+    setItems(getTranscriptions());
+    setLoading(false);
   }, []);
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const data = await getTranscriptions();
-      setItems(data);
-    } catch {
-      showToast("⚠️ Could not load history — is the backend running?");
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleDelete = async (e, id) => {
-    e.stopPropagation();
-    try {
-      await deleteTranscription(id);
-      setItems((prev) => prev.filter((i) => i.id !== id));
-      showToast("✓ Deleted");
-      if (expanded === id) setExpanded(null);
-    } catch {
-      showToast("⚠️ Could not delete");
-    }
-  };
-
+ const handleDelete = (e, id) => {
+  e.stopPropagation();
+  deleteTranscription(id);
+  setItems((prev) => prev.filter((i) => i.id !== id));
+  showToast("Deleted");
+};
   const handleCopy = (e, text) => {
     e.stopPropagation();
     navigator.clipboard.writeText(text);
@@ -57,8 +41,11 @@ export default function History() {
   const formatDate = (iso) => {
     const d = new Date(iso);
     return d.toLocaleString("en-GB", {
-      day: "numeric", month: "short", year: "numeric",
-      hour: "2-digit", minute: "2-digit"
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -73,7 +60,13 @@ export default function History() {
       </div>
 
       {loading && (
-        <div style={{ textAlign: "center", color: "var(--muted)", padding: "3rem" }}>
+        <div
+          style={{
+            textAlign: "center",
+            color: "var(--muted)",
+            padding: "3rem",
+          }}
+        >
           <div className="spinner" style={{ margin: "0 auto 1rem" }} />
           Loading…
         </div>
@@ -82,33 +75,63 @@ export default function History() {
       {!loading && items.length === 0 && (
         <div className="history-empty">
           <div className="empty-icon">🗒️</div>
-          <p>No saved transcriptions yet.<br />Go to Transcribe and save one!</p>
+          <p>
+            No saved transcriptions yet.
+            <br />
+            Go to Transcribe and save one!
+          </p>
         </div>
       )}
 
-      {!loading && items.map((item, i) => (
-        <div
-          key={item.id}
-          className="history-item"
-          style={{ animationDelay: `${i * 0.06}s` }}
-          onClick={() => setExpanded(expanded === item.id ? null : item.id)}
-        >
-          <div className="history-item-header">
-            <span className="badge">{item.source === "microphone" ? "🎙️ Mic" : "📁 Upload"}</span>
-            <span className="history-date">{formatDate(item.created_at)}</span>
-          </div>
+      {!loading &&
+        items.map((item, i) => (
+          <div
+            key={item.id}
+            className="history-item"
+            style={{ animationDelay: `${i * 0.06}s` }}
+            onClick={() => setExpanded(expanded === item.id ? null : item.id)}
+          >
+            <div className="history-item-header">
+              <span className="badge">
+                {item.source === "microphone" ? "🎙️ Mic" : "📁 Upload"}
+              </span>
+              <span className="history-date">
+                {formatDate(item.created_at)}
+              </span>
+            </div>
 
-          <div className="history-preview" style={expanded === item.id ? { WebkitLineClamp: "unset" } : {}}>
-            {item.text}
-          </div>
+            <div
+              className="history-preview"
+              style={expanded === item.id ? { WebkitLineClamp: "unset" } : {}}
+            >
+              {item.text}
+            </div>
 
-          <div className="history-actions" onClick={(e) => e.stopPropagation()}>
-            <button className="btn-icon" onClick={(e) => handleCopy(e, item.text)}>📋 Copy</button>
-            <button className="btn-icon" onClick={(e) => handleDownload(e, item.text, item.id)}>⬇ Download</button>
-            <button className="btn-icon danger" onClick={(e) => handleDelete(e, item.id)}>🗑 Delete</button>
+            <div
+              className="history-actions"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="btn-icon"
+                onClick={(e) => handleCopy(e, item.text)}
+              >
+                📋 Copy
+              </button>
+              <button
+                className="btn-icon"
+                onClick={(e) => handleDownload(e, item.text, item.id)}
+              >
+                ⬇ Download
+              </button>
+              <button
+                className="btn-icon danger"
+                onClick={(e) => handleDelete(e, item.id)}
+              >
+                🗑 Delete
+              </button>
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
 
       <Toast toast={toast} />
     </div>

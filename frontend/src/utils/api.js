@@ -14,28 +14,32 @@ export async function transcribeAudio(blob) {
     throw new Error(err.error || "Transcription failed");
   }
 
-  return res.json(); // { text, words, duration }
-}
-
-export async function saveTranscription(text, source) {
-  const res = await fetch(`${BASE}/transcriptions`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, source }),
-  });
-
-  if (!res.ok) throw new Error("Failed to save");
   return res.json();
 }
 
-export async function getTranscriptions() {
-  const res = await fetch(`${BASE}/transcriptions`);
-  if (!res.ok) throw new Error("Failed to load");
-  return res.json();
+// ── Local storage helpers ──
+export function saveTranscription(text, source) {
+  const items = getTranscriptions();
+  const newItem = {
+    id: Date.now(),
+    text,
+    source,
+    created_at: new Date().toISOString(),
+  };
+  items.unshift(newItem);
+  localStorage.setItem("vs_transcriptions", JSON.stringify(items));
+  return newItem;
 }
 
-export async function deleteTranscription(id) {
-  const res = await fetch(`${BASE}/transcriptions/${id}`, { method: "DELETE" });
-  if (!res.ok) throw new Error("Failed to delete");
-  return res.json();
+export function getTranscriptions() {
+  try {
+    return JSON.parse(localStorage.getItem("vs_transcriptions") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+export function deleteTranscription(id) {
+  const items = getTranscriptions().filter((i) => i.id !== id);
+  localStorage.setItem("vs_transcriptions", JSON.stringify(items));
 }
