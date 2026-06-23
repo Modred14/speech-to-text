@@ -104,7 +104,7 @@ export default function Home() {
           <span>🎙️</span> Open-Source · MIT Licensed
         </div>
         <h1>Turn speech into text — instantly</h1>
-        <p>Record your microphone or upload an audio file. Powered by Groq AI.</p>
+        <p>Record your microphone or upload an audio file.</p>
       </div>
 
       {/* Microphone recorder */}
@@ -167,7 +167,7 @@ export default function Home() {
       {processing && (
         <div className="processing">
           <div className="spinner" />
-          <span className="processing-text">Transcribing your audio with Groq AI…</span>
+          <span className="processing-text">Transcribing your audio…</span>
         </div>
       )}
 
